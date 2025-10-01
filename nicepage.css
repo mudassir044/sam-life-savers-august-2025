@@ -46767,7 +46767,7 @@ a.u-link.u-text-hover-color-var:hover {
 
 /*end-variables sitestylecss*/
  .u-header {
-  background-image: linear-gradient(to bottom, #478ac9, #ff141e);
+  background-image: linear-gradient(to bottom, ##000000, #111111);
   box-shadow: -2px -2px 15px 0px rgba(128,128,128,1);
   background-position: 50% 50%;
   background-repeat: no-repeat;
