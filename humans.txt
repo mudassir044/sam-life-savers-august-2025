@@ -1,0 +1,16 @@
+/* TEAM */
+Organization: Sam Life Savers
+Website: https://sam-life-savers-august-2025-dah8vd553.vercel.app
+Contact: info@samlifesavers.org
+Location: Rawalpindi, Pakistan
+
+/* THANKS */
+Community: All our volunteers and supporters
+Donors: Everyone who has contributed to our cause
+
+/* SITE */
+Last update: 2025/01/15
+Standards: HTML5, CSS3
+Components: jQuery, Nicepage
+Software: Vercel
+

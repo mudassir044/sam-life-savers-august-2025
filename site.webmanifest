@@ -1,0 +1,23 @@
+{
+  "name": "Sam Life Savers",
+  "short_name": "SLS",
+  "description": "A student-led movement revolutionizing humanitarian aid in Pakistan",
+  "icons": [
+    {
+      "src": "images/logo-sls.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "images/logo-sls.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#ff141e",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "start_url": "/",
+  "scope": "/"
+}
+
