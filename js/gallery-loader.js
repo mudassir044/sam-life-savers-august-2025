@@ -3,11 +3,13 @@ async function loadGallery() {
     try {
         const response = await fetch('/api/gallery/list');
         if (!response.ok) {
-            console.error('Failed to load gallery');
+            console.error('Failed to load gallery:', response.status, response.statusText);
             return;
         }
         
         const images = await response.json();
+        console.log('Gallery loaded:', images.length, 'images');
+        
         const galleryContainer = document.querySelector('.u-gallery-inner-1');
         
         if (!galleryContainer) {
@@ -19,18 +21,29 @@ async function loadGallery() {
         galleryContainer.innerHTML = '';
 
         // Add images to gallery
+        if (!images || images.length === 0) {
+            console.log('No images in gallery');
+            return;
+        }
+
         images.forEach((image, index) => {
             const isActive = index === 0 ? 'u-active' : '';
             const itemNumber = index + 1;
+            
+            // Handle both relative paths and full URLs (Vercel Blob URLs)
+            let imageSrc = image.image;
+            if (imageSrc && !imageSrc.startsWith('http') && !imageSrc.startsWith('/')) {
+                imageSrc = '/' + imageSrc;
+            }
             
             const galleryItem = document.createElement('div');
             galleryItem.className = `${isActive} u-carousel-item u-gallery-item u-carousel-item-${itemNumber}`;
             galleryItem.innerHTML = `
                 <div class="u-back-slide" data-image-width="${image.width || 1920}" data-image-height="${image.height || 1080}">
-                    <img class="u-back-image u-expanded" src="${image.image}" alt="${image.title}">
+                    <img class="u-back-image u-expanded" src="${imageSrc}" alt="${image.title || 'Gallery image'}" onerror="console.error('Failed to load image:', '${imageSrc}')">
                 </div>
                 <div class="u-align-center u-over-slide u-valign-bottom u-over-slide-${itemNumber}">
-                    <h3 class="u-gallery-heading">${image.title}</h3>
+                    <h3 class="u-gallery-heading">${image.title || 'Untitled'}</h3>
                     <p class="u-gallery-text">${image.description || ''}</p>
                 </div>
             `;
