@@ -209,12 +209,8 @@
     <div class="container">
         <div class="upload-section">
             <h2>Upload New Image</h2>
-            <div style="background: #fff3cd; border: 1px solid #ffc107; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
-                <strong>⚠️ Note:</strong> On Vercel, direct file uploads are limited. Please use one of these methods:
-                <ol style="margin: 10px 0 0 20px;">
-                    <li><strong>Git Method:</strong> Add images to the <code>images/</code> folder and update <code>gallery.json</code>, then commit to Git</li>
-                    <li><strong>Manual Method:</strong> Use the form below to prepare the data, then add files manually</li>
-                </ol>
+            <div style="background: #d1ecf1; border: 1px solid #0c5460; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                <strong>✅ Using Vercel Blob Storage:</strong> Images are now uploaded directly to Vercel Blob and automatically added to your gallery!
             </div>
             <div class="message" id="message"></div>
             <form id="uploadForm">
@@ -246,6 +242,13 @@
                 <!-- Images will be loaded here -->
             </div>
         </div>
+
+        <div class="submissions-section" style="margin-top: 40px;">
+            <h2>Form Submissions</h2>
+            <div id="submissionsList">
+                <!-- Submissions will be loaded here -->
+            </div>
+        </div>
     </div>
 
     <script>
@@ -269,10 +272,9 @@
             }
         });
 
-        // Upload form
+        // Upload form with Vercel Blob
         document.getElementById('uploadForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const formData = new FormData();
             const fileInput = document.getElementById('imageFile');
             const title = document.getElementById('imageTitle').value;
             const description = document.getElementById('imageDescription').value;
@@ -282,31 +284,58 @@
                 return;
             }
 
-            formData.append('image', fileInput.files[0]);
-            formData.append('title', title);
-            formData.append('description', description);
+            const file = fileInput.files[0];
+            showMessage('Uploading image to Vercel Blob...', 'success');
 
             try {
-                const response = await fetch('/api/gallery/upload', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: formData
-                });
+                // Convert file to base64
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    const fileData = e.target.result; // base64 data URL
+                    
+                    try {
+                        // Upload to Vercel Blob via our API
+                        const response = await fetch('/api/gallery/upload-blob', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({
+                                fileData: fileData,
+                                filename: file.name,
+                                contentType: file.type,
+                                title: title,
+                                description: description
+                            })
+                        });
 
-                const data = await response.json();
+                        const data = await response.json();
 
-                if (response.ok) {
-                    showMessage('Image uploaded successfully!', 'success');
-                    document.getElementById('uploadForm').reset();
-                    document.getElementById('imagePreview').classList.remove('show');
-                    loadGallery();
-                } else {
-                    showMessage(data.error || 'Upload failed', 'error');
-                }
+                        if (response.ok) {
+                            if (data.updatedGallery) {
+                                // On Vercel, show instructions to update Git
+                                showMessage('Image uploaded to Vercel Blob! Please copy the gallery data and commit to Git.', 'success');
+                                console.log('Updated gallery.json:', JSON.stringify(data.updatedGallery, null, 2));
+                                alert('Image uploaded! Check console for updated gallery.json data to commit.');
+                            } else {
+                                showMessage('Image uploaded successfully!', 'success');
+                            }
+                            document.getElementById('uploadForm').reset();
+                            document.getElementById('imagePreview').classList.remove('show');
+                            loadGallery();
+                        } else {
+                            showMessage(data.error || 'Upload failed', 'error');
+                        }
+                    } catch (error) {
+                        console.error('Upload error:', error);
+                        showMessage('Upload failed: ' + error.message, 'error');
+                    }
+                };
+                reader.readAsDataURL(file);
             } catch (error) {
-                showMessage('Upload failed. Please try again.', 'error');
+                console.error('Upload error:', error);
+                showMessage('Upload failed: ' + error.message, 'error');
             }
         });
 
@@ -376,8 +405,58 @@
             window.location.href = '/admin/login.html';
         }
 
-        // Load gallery on page load
+        // Load form submissions
+        async function loadSubmissions() {
+            try {
+                const response = await fetch('/api/forms/list', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load submissions');
+                }
+
+                const submissions = await response.json();
+                const listDiv = document.getElementById('submissionsList');
+                
+                if (submissions.length === 0) {
+                    listDiv.innerHTML = '<p style="text-align: center; color: #666;">No submissions yet.</p>';
+                    return;
+                }
+
+                listDiv.innerHTML = submissions.map(sub => {
+                    const date = new Date(sub.timestamp).toLocaleString();
+                    const dataHtml = Object.entries(sub.data).map(([key, value]) => {
+                        const displayValue = Array.isArray(value) ? value.join(', ') : value;
+                        return `<p><strong>${key}:</strong> ${displayValue}</p>`;
+                    }).join('');
+
+                    return `
+                        <div style="background: white; border: 1px solid #ddd; border-radius: 5px; padding: 20px; margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                                <h3 style="margin: 0; color: #333;">${sub.formType.toUpperCase()} Form Submission #${sub.id}</h3>
+                                <span style="color: #666; font-size: 14px;">${date}</span>
+                            </div>
+                            <div style="background: #f9f9f9; padding: 15px; border-radius: 3px;">
+                                ${dataHtml}
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <span style="background: ${sub.status === 'new' ? '#28a745' : '#6c757d'}; color: white; padding: 4px 12px; border-radius: 3px; font-size: 12px;">${sub.status}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Failed to load submissions:', error);
+                document.getElementById('submissionsList').innerHTML = '<p style="color: #e74c3c;">Failed to load submissions.</p>';
+            }
+        }
+
+        // Load gallery and submissions on page load
         loadGallery();
+        loadSubmissions();
     </script>
 </body>
 </html>
