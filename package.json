@@ -6,9 +6,7 @@
     "dev": "vercel dev",
     "build": "echo 'No build step required'"
   },
-  "dependencies": {
-    "formidable": "^3.5.1"
-  },
+  "dependencies": {},
   "devDependencies": {}
 }
 

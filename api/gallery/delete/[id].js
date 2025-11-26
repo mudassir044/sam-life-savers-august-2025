@@ -21,6 +21,8 @@ module.exports = async (req, res) => {
   try {
     const { id } = req.query;
     const galleryPath = path.join(process.cwd(), 'gallery.json');
+    
+    // Read gallery.json (read-only is allowed)
     const galleryData = fs.readFileSync(galleryPath, 'utf8');
     const gallery = JSON.parse(galleryData);
 
@@ -30,17 +32,26 @@ module.exports = async (req, res) => {
     }
 
     const image = gallery[imageIndex];
-    const imagePath = path.join(process.cwd(), image.image);
-    if (fs.existsSync(imagePath)) {
-      fs.unlinkSync(imagePath);
-    }
-
+    
+    // Note: File deletion won't work on Vercel (read-only filesystem)
+    // Return the image info so it can be removed from Git
     gallery.splice(imageIndex, 1);
-    fs.writeFileSync(galleryPath, JSON.stringify(gallery, null, 2));
+    
+    // Note: This write will fail on Vercel, but we return the updated data
+    try {
+      fs.writeFileSync(galleryPath, JSON.stringify(gallery, null, 2));
+    } catch (writeError) {
+      // Expected on Vercel - return the updated gallery data
+      return res.status(200).json({ 
+        message: 'Image marked for deletion. Please update gallery.json in Git.',
+        updatedGallery: gallery,
+        deletedImage: image
+      });
+    }
 
     return res.status(200).json({ message: 'Image deleted successfully' });
   } catch (error) {
     console.error('Delete error:', error);
-    return res.status(500).json({ error: 'Delete failed' });
+    return res.status(500).json({ error: 'Delete failed: ' + error.message });
   }
 };
