@@ -28,7 +28,6 @@ module.exports = async (req, res) => {
   }
 
   try {
-    // Parse multipart form data or JSON
     let body;
     if (typeof req.body === 'string') {
       body = JSON.parse(req.body);
@@ -46,19 +45,20 @@ module.exports = async (req, res) => {
       const ext = filename.split('.').pop() || 'jpg';
       const blobFilename = `gallery/${timestamp}-${filename.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
       
-      // Convert base64 to buffer if needed
+      // Convert base64 to buffer
       let fileBuffer;
       if (fileData.startsWith('data:')) {
-        // Remove data URL prefix
         const base64Data = fileData.split(',')[1];
         fileBuffer = Buffer.from(base64Data, 'base64');
       } else {
         fileBuffer = Buffer.from(fileData, 'base64');
       }
 
+      // Upload to Vercel Blob with token from environment
       const blob = await put(blobFilename, fileBuffer, {
         access: 'public',
         contentType: contentType || 'image/jpeg',
+        token: process.env.BLOB_READ_WRITE_TOKEN, // Use token from environment
       });
 
       finalImageUrl = blob.url;
@@ -82,7 +82,7 @@ module.exports = async (req, res) => {
     // Add new image to gallery
     const newImage = {
       id: gallery.length > 0 ? Math.max(...gallery.map(img => img.id)) + 1 : 1,
-      image: finalImageUrl,
+      image: imageUrl,
       title: title || 'Untitled',
       description: description || '',
       width: 1920,
@@ -96,7 +96,7 @@ module.exports = async (req, res) => {
       fs.writeFileSync(galleryPath, JSON.stringify(gallery, null, 2));
     } catch (writeError) {
       return res.status(200).json({ 
-        message: 'Image uploaded to Vercel Blob! Please update gallery.json in Git with the updatedGallery data below.',
+        message: 'Image added to gallery! Please update gallery.json in Git with the updatedGallery data below.',
         image: newImage,
         updatedGallery: gallery,
         note: 'Copy the updatedGallery array and commit to gallery.json'
