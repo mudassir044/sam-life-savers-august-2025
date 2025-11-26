@@ -209,17 +209,6 @@
     <div class="container">
         <div class="upload-section">
             <h2>Upload New Image</h2>
-            <div style="background: #fff3cd; border: 1px solid #ffc107; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
-                <strong>⚠️ Setup Required:</strong> To use Vercel Blob Storage, you need to add the <code>BLOB_READ_WRITE_TOKEN</code> environment variable in your Vercel project settings.
-                <br><br>
-                <strong>How to get the token:</strong>
-                <ol style="margin: 10px 0 0 20px; font-size: 14px;">
-                    <li>Go to <a href="https://vercel.com/dashboard" target="_blank">Vercel Dashboard</a></li>
-                    <li>Select your project → Settings → Environment Variables</li>
-                    <li>Add: <code>BLOB_READ_WRITE_TOKEN</code> = <code>vercel_blob_rw_...</code></li>
-                    <li>Get the token from: <a href="https://vercel.com/docs/storage/vercel-blob/quickstart#create-a-blob-store" target="_blank">Vercel Blob Settings</a></li>
-                </ol>
-            </div>
             <div class="message" id="message"></div>
             <form id="uploadForm">
                 <div class="form-group">
@@ -321,17 +310,27 @@
                         const data = await response.json();
 
                         if (response.ok) {
-                            if (data.updatedGallery) {
-                                // On Vercel, show instructions to update Git
-                                showMessage('Image uploaded to Vercel Blob! Please copy the gallery data and commit to Git.', 'success');
-                                console.log('Updated gallery.json:', JSON.stringify(data.updatedGallery, null, 2));
-                                alert('Image uploaded! Check console for updated gallery.json data to commit.');
+                            showMessage(data.message || 'Image uploaded successfully!', 'success');
+                            
+                            // If gallery data is returned, update the display immediately
+                            if (data.gallery && Array.isArray(data.gallery)) {
+                                // Update gallery display immediately with new data
+                                displayGallery(data.gallery);
+                            } else if (data.image) {
+                                // If only single image, reload from server
+                                loadGallery();
                             } else {
-                                showMessage('Image uploaded successfully!', 'success');
+                                // Fallback: reload from server
+                                loadGallery();
                             }
+                            
                             document.getElementById('uploadForm').reset();
                             document.getElementById('imagePreview').classList.remove('show');
-                            loadGallery();
+                            
+                            // Show note if manual update needed
+                            if (data.updatedGallery && !data.galleryUrl) {
+                                console.log('Updated gallery.json (for Git commit):', JSON.stringify(data.updatedGallery, null, 2));
+                            }
                         } else {
                             showMessage(data.error || 'Upload failed', 'error');
                         }
@@ -347,30 +346,46 @@
             }
         });
 
-        // Load gallery
+        // Display gallery (shared function)
+        function displayGallery(images) {
+            const grid = document.getElementById('galleryGrid');
+            grid.innerHTML = '';
+
+            if (!images || images.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">No images in gallery yet.</p>';
+                return;
+            }
+
+            images.forEach(image => {
+                const item = document.createElement('div');
+                item.className = 'gallery-item';
+                // Handle both relative paths and full URLs (Vercel Blob URLs)
+                const imageSrc = image.image.startsWith('http') ? image.image : `/${image.image}`;
+                item.innerHTML = `
+                    <button class="delete-btn" onclick="deleteImage(${image.id})">×</button>
+                    <img src="${imageSrc}" alt="${image.title}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'300\'%3E%3Crect fill=\'%23ddd\' width=\'400\' height=\'300\'/%3E%3Ctext fill=\'%23999\' font-family=\'sans-serif\' font-size=\'18\' dy=\'10.5\' font-weight=\'bold\' x=\'50%25\' y=\'50%25\' text-anchor=\'middle\'%3EImage not found%3C/text%3E%3C/svg%3E'">
+                    <div class="gallery-item-info">
+                        <h3>${image.title}</h3>
+                        <p>${image.description || 'No description'}</p>
+                    </div>
+                `;
+                grid.appendChild(item);
+            });
+        }
+
+        // Load gallery from server
         async function loadGallery() {
             try {
                 const response = await fetch('/api/gallery/list');
+                if (!response.ok) {
+                    throw new Error('Failed to load gallery');
+                }
                 const images = await response.json();
-                
-                const grid = document.getElementById('galleryGrid');
-                grid.innerHTML = '';
-
-                images.forEach(image => {
-                    const item = document.createElement('div');
-                    item.className = 'gallery-item';
-                    item.innerHTML = `
-                        <button class="delete-btn" onclick="deleteImage(${image.id})">×</button>
-                        <img src="/${image.image}" alt="${image.title}">
-                        <div class="gallery-item-info">
-                            <h3>${image.title}</h3>
-                            <p>${image.description || 'No description'}</p>
-                        </div>
-                    `;
-                    grid.appendChild(item);
-                });
+                displayGallery(images);
             } catch (error) {
                 console.error('Failed to load gallery:', error);
+                const grid = document.getElementById('galleryGrid');
+                grid.innerHTML = '<p style="text-align: center; color: #e74c3c; padding: 20px;">Failed to load gallery. Please refresh the page.</p>';
             }
         }
 

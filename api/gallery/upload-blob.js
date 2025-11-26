@@ -82,7 +82,7 @@ module.exports = async (req, res) => {
     // Add new image to gallery
     const newImage = {
       id: gallery.length > 0 ? Math.max(...gallery.map(img => img.id)) + 1 : 1,
-      image: imageUrl,
+      image: finalImageUrl, // Use finalImageUrl (the Vercel Blob URL)
       title: title || 'Untitled',
       description: description || '',
       width: 1920,
@@ -91,21 +91,47 @@ module.exports = async (req, res) => {
 
     gallery.push(newImage);
 
-    // Try to save (works locally, on Vercel returns data for Git commit)
+    // Try to save gallery.json locally first
+    let savedLocally = false;
     try {
       fs.writeFileSync(galleryPath, JSON.stringify(gallery, null, 2));
+      savedLocally = true;
     } catch (writeError) {
-      return res.status(200).json({ 
-        message: 'Image added to gallery! Please update gallery.json in Git with the updatedGallery data below.',
-        image: newImage,
-        updatedGallery: gallery,
-        note: 'Copy the updatedGallery array and commit to gallery.json'
-      });
+      // On Vercel, filesystem is read-only, so we'll store in Blob
+      savedLocally = false;
+    }
+
+    // If local save failed (Vercel), store gallery.json in Blob
+    if (!savedLocally) {
+      try {
+        const galleryJsonString = JSON.stringify(gallery, null, 2);
+        const galleryBlob = await put('gallery.json', galleryJsonString, {
+          access: 'public',
+          contentType: 'application/json',
+          token: process.env.BLOB_READ_WRITE_TOKEN,
+        });
+        
+        return res.status(200).json({ 
+          message: 'Image uploaded successfully! Gallery updated in Vercel Blob.',
+          image: newImage,
+          galleryUrl: galleryBlob.url,
+          gallery: gallery // Return full gallery for immediate display
+        });
+      } catch (blobError) {
+        // If Blob storage also fails, return the data for manual update
+        return res.status(200).json({ 
+          message: 'Image uploaded to Vercel Blob! Please update gallery.json manually.',
+          image: newImage,
+          updatedGallery: gallery,
+          note: 'Copy the updatedGallery array and commit to gallery.json, or set BLOB_READ_WRITE_TOKEN to auto-update'
+        });
+      }
     }
 
     return res.status(200).json({ 
       message: 'Image uploaded successfully',
-      image: newImage
+      image: newImage,
+      gallery: gallery // Return full gallery for immediate display
     });
   } catch (error) {
     console.error('Upload error:', error);
