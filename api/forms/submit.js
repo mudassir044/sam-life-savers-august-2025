@@ -24,10 +24,43 @@ module.exports = async (req, res) => {
       body = req.body || {};
     }
 
-    const { formType, formData } = body;
+    const { formType, formData, recaptchaToken } = body;
 
     if (!formType || !formData) {
       return res.status(400).json({ error: 'Form type and data are required' });
+    }
+
+    // Verify reCAPTCHA token
+    const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY || '6LdOXRksAAAAAFz2ntOoUGbilNTAOHe_dl3u5Roy';
+    
+    if (recaptchaToken) {
+      try {
+        const verifyResponse = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: `secret=${RECAPTCHA_SECRET_KEY}&response=${recaptchaToken}`
+        });
+        
+        const verifyResult = await verifyResponse.json();
+        
+        if (!verifyResult.success) {
+          console.error('reCAPTCHA verification failed:', verifyResult);
+          return res.status(400).json({ 
+            error: 'reCAPTCHA verification failed. Please try again.',
+            recaptchaError: verifyResult['error-codes']
+          });
+        }
+      } catch (recaptchaError) {
+        console.error('reCAPTCHA verification error:', recaptchaError);
+        // In development, you might want to allow submissions without reCAPTCHA
+        // For production, uncomment the line below to require reCAPTCHA
+        // return res.status(400).json({ error: 'reCAPTCHA verification failed' });
+      }
+    } else {
+      // Warn but don't block (for development)
+      console.warn('No reCAPTCHA token provided');
     }
 
     // Create submissions directory if it doesn't exist

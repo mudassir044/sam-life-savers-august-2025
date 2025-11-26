@@ -91,25 +91,26 @@ module.exports = async (req, res) => {
 
     gallery.push(newImage);
 
-    // Try to save gallery.json locally first
-    let savedLocally = false;
-    try {
-      fs.writeFileSync(galleryPath, JSON.stringify(gallery, null, 2));
-      savedLocally = true;
-    } catch (writeError) {
-      // On Vercel, filesystem is read-only, so we'll store in Blob
-      savedLocally = false;
-    }
+    const galleryJsonString = JSON.stringify(gallery, null, 2);
 
-    // If local save failed (Vercel), store gallery.json in Blob
-    if (!savedLocally) {
+    // Always save to Blob if token is available (for Vercel production)
+    if (process.env.BLOB_READ_WRITE_TOKEN) {
       try {
-        const galleryJsonString = JSON.stringify(gallery, null, 2);
+        // Save gallery.json to Blob - this will overwrite any existing one
         const galleryBlob = await put('gallery.json', galleryJsonString, {
           access: 'public',
           contentType: 'application/json',
           token: process.env.BLOB_READ_WRITE_TOKEN,
         });
+        
+        console.log('Saved gallery.json to Blob:', galleryBlob.url);
+        
+        // Also try to save locally if possible (for local dev)
+        try {
+          fs.writeFileSync(galleryPath, galleryJsonString);
+        } catch (localError) {
+          // Ignore local save errors on Vercel
+        }
         
         return res.status(200).json({ 
           message: 'Image uploaded successfully! Gallery updated in Vercel Blob.',
@@ -118,21 +119,42 @@ module.exports = async (req, res) => {
           gallery: gallery // Return full gallery for immediate display
         });
       } catch (blobError) {
-        // If Blob storage also fails, return the data for manual update
+        console.error('Error saving to Blob:', blobError);
+        // If Blob storage fails, try local save and return data
+        try {
+          fs.writeFileSync(galleryPath, galleryJsonString);
+          return res.status(200).json({ 
+            message: 'Image uploaded successfully (saved locally).',
+            image: newImage,
+            gallery: gallery
+          });
+        } catch (localError) {
+          // Both failed - return data for manual update
+          return res.status(200).json({ 
+            message: 'Image uploaded to Vercel Blob, but gallery.json update failed. Please update manually.',
+            image: newImage,
+            updatedGallery: gallery,
+            error: blobError.message
+          });
+        }
+      }
+    } else {
+      // No Blob token - try local save only
+      try {
+        fs.writeFileSync(galleryPath, galleryJsonString);
         return res.status(200).json({ 
-          message: 'Image uploaded to Vercel Blob! Please update gallery.json manually.',
+          message: 'Image uploaded successfully',
           image: newImage,
-          updatedGallery: gallery,
-          note: 'Copy the updatedGallery array and commit to gallery.json, or set BLOB_READ_WRITE_TOKEN to auto-update'
+          gallery: gallery
+        });
+      } catch (localError) {
+        return res.status(200).json({ 
+          message: 'Image uploaded, but gallery.json could not be saved. Please set BLOB_READ_WRITE_TOKEN.',
+          image: newImage,
+          updatedGallery: gallery
         });
       }
     }
-
-    return res.status(200).json({ 
-      message: 'Image uploaded successfully',
-      image: newImage,
-      gallery: gallery // Return full gallery for immediate display
-    });
   } catch (error) {
     console.error('Upload error:', error);
     return res.status(500).json({ error: 'Upload failed: ' + error.message });

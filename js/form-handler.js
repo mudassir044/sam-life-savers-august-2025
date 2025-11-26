@@ -41,6 +41,17 @@
                 if (errorMsg) errorMsg.style.display = 'none';
 
                 try {
+                    // Get reCAPTCHA token first
+                    let recaptchaToken = '';
+                    try {
+                        if (window.getRecaptchaToken) {
+                            recaptchaToken = await window.getRecaptchaToken();
+                        }
+                    } catch (recaptchaError) {
+                        console.warn('reCAPTCHA error:', recaptchaError);
+                        // Continue without token if reCAPTCHA fails (for development)
+                    }
+                    
                     // Collect form data
                     const formData = {};
                     const formElements = form.querySelectorAll('input, textarea, select');
@@ -75,7 +86,7 @@
                         }
                     });
 
-                    // Send to our API
+                    // Send to our API with reCAPTCHA token
                     const response = await fetch('/api/forms/submit', {
                         method: 'POST',
                         headers: {
@@ -83,7 +94,8 @@
                         },
                         body: JSON.stringify({
                             formType: formType,
-                            formData: formData
+                            formData: formData,
+                            recaptchaToken: recaptchaToken
                         })
                     });
 
