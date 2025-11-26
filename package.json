@@ -1,0 +1,14 @@
+{
+  "name": "sam-life-savers",
+  "version": "1.0.0",
+  "description": "Sam Life Savers Website",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'No build step required'"
+  },
+  "dependencies": {
+    "formidable": "^3.5.1"
+  },
+  "devDependencies": {}
+}
+

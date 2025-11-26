@@ -1,0 +1,27 @@
+[
+  {
+    "id": 1,
+    "image": "images/4.jpeg",
+    "title": "Sample Title",
+    "description": "Sample Text",
+    "width": 1080,
+    "height": 721
+  },
+  {
+    "id": 2,
+    "image": "images/WhatsApnvgpImage2025-07-15at05.15.58.jpeg",
+    "title": "Sample Title",
+    "description": "Sample Text",
+    "width": 1170,
+    "height": 627
+  },
+  {
+    "id": 3,
+    "image": "images/WhatsApgvgpImage2025-07-15at05.15.57.jpeg",
+    "title": "Sample Title",
+    "description": "Sample Text",
+    "width": 809,
+    "height": 858
+  }
+]
+
