@@ -104,12 +104,14 @@ module.exports = async (req, res) => {
         });
         
         console.log('Saved gallery.json to Blob:', galleryBlob.url);
+        console.log('Gallery contains', gallery.length, 'images');
         
         // Also try to save locally if possible (for local dev)
         try {
           fs.writeFileSync(galleryPath, galleryJsonString);
         } catch (localError) {
           // Ignore local save errors on Vercel
+          console.log('Local save skipped (Vercel read-only)');
         }
         
         return res.status(200).json({ 
@@ -119,22 +121,28 @@ module.exports = async (req, res) => {
           gallery: gallery // Return full gallery for immediate display
         });
       } catch (blobError) {
-        console.error('Error saving to Blob:', blobError);
+        console.error('Error saving to Blob:', blobError.message);
+        console.error('Blob error details:', blobError);
+        
         // If Blob storage fails, try local save and return data
         try {
           fs.writeFileSync(galleryPath, galleryJsonString);
+          console.log('Saved locally as fallback');
           return res.status(200).json({ 
-            message: 'Image uploaded successfully (saved locally).',
+            message: 'Image uploaded successfully (saved locally). Blob storage failed.',
             image: newImage,
-            gallery: gallery
+            gallery: gallery,
+            warning: 'Blob storage unavailable. Image saved locally only.'
           });
         } catch (localError) {
           // Both failed - return data for manual update
+          console.error('Both Blob and local save failed');
           return res.status(200).json({ 
-            message: 'Image uploaded to Vercel Blob, but gallery.json update failed. Please update manually.',
+            message: 'Image uploaded to Vercel Blob, but gallery.json update failed. Please check BLOB_READ_WRITE_TOKEN.',
             image: newImage,
             updatedGallery: gallery,
-            error: blobError.message
+            error: blobError.message,
+            note: 'Please verify BLOB_READ_WRITE_TOKEN is set in Vercel environment variables'
           });
         }
       }
