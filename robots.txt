@@ -1,5 +1,5 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://sam-life-savers-august-2025-dah8vd553.vercel.app/sitemap.xml
+Sitemap: https://samlifesavers.org/sitemap.xml
 

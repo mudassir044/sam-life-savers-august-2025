@@ -1,6 +1,6 @@
 /* TEAM */
 Organization: Sam Life Savers
-Website: https://sam-life-savers-august-2025-dah8vd553.vercel.app
+Website: https://samlifesavers.org
 Contact: info@samlifesavers.org
 Location: Rawalpindi, Pakistan
 
