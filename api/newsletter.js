@@ -101,7 +101,10 @@ async function sendAdminEmail(subject, fields, replyTo) {
 
 async function sendAutoReply(to) {
   const templateId = process.env.TEMPLATE_NEWSLETTER;
-  if (!templateId) return;
+  if (!templateId) {
+    console.error('[AUTO-REPLY FAILED] TEMPLATE_NEWSLETTER environment variable is not set');
+    throw new Error('TEMPLATE_NEWSLETTER environment variable is missing. Please set it in Vercel dashboard.');
+  }
   await resend.emails.send({
     from: 'SAM Life Savers <newsletter@join.samlifesavers.org>',
     to,

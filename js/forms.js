@@ -10,6 +10,13 @@
     }
 
     function init() {
+        // Prevent Nicepage form handlers from interfering
+        // Remove Nicepage form action URLs if they exist
+        document.querySelectorAll('form[action*="nicepagesrv.com"]').forEach(form => {
+            form.setAttribute('action', '#');
+            form.removeAttribute('source');
+        });
+
         // Find all forms
         const forms = document.querySelectorAll('form');
         
@@ -18,9 +25,16 @@
             const apiEndpoint = getApiEndpoint(form);
             if (!apiEndpoint) return; // Skip forms without matching endpoint
 
-            // Override form submission
+            // Remove Nicepage hidden fields
+            form.querySelectorAll('input[name="recaptchaResponse"], input[name="formServices"]').forEach(field => {
+                field.remove();
+            });
+
+            // Override form submission - use capture phase to run before other handlers
             form.addEventListener('submit', async function(e) {
                 e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
                 
                 const submitButton = form.querySelector('input[type="submit"], button[type="submit"], .u-btn-submit, a.u-btn-submit');
                 const originalText = submitButton ? (submitButton.textContent || submitButton.value || 'Submit') : 'Submit';
@@ -72,7 +86,11 @@
                     
                     // Handle duplicate field names as arrays
                     // Include honeypot field - API needs it for spam protection
+                    // Exclude Nicepage fields
                     for (const [key, value] of formData.entries()) {
+                        // Skip Nicepage-specific fields
+                        if (key === 'recaptchaResponse' || key === 'formServices') continue;
+                        
                         if (data[key]) {
                             if (Array.isArray(data[key])) {
                                 data[key].push(value);

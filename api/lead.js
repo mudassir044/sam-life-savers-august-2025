@@ -138,7 +138,11 @@ async function sendAdminEmail(subject, fields, replyTo) {
 async function sendAutoReply(intent, to) {
   const templateId = TEMPLATE_MAP[intent] || TEMPLATE_MAP.default;
   const from = FROM_MAP[intent] || FROM_MAP.default;
-  if (!templateId) return;
+  if (!templateId) {
+    const envVarName = `TEMPLATE_${intent.toUpperCase()}`;
+    console.error(`[AUTO-REPLY FAILED] Template ID missing for intent: ${intent}, env var: ${envVarName}`);
+    throw new Error(`Template ID missing for intent: ${intent}. Please set ${envVarName} environment variable.`);
+  }
   await resend.emails.send({
     from,
     to,
