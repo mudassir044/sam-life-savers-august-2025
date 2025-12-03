@@ -242,7 +242,7 @@ borders: top right bottom left !important; border-color: #ff141e !important; bor
                       <div class="u-form-group u-form-select u-label-none u-form-group-6">
                         <label for="select-bb27" class="u-label">Dropdown</label>
                         <div class="u-form-select-wrapper">
-                          <select id="select-bb27" name="select[][]" class="u-border-no-left u-border-no-right u-border-no-top u-input u-input-rectangle" size="3" multiple="multiple">
+                          <select id="select-bb27" name="intent" class="u-border-no-left u-border-no-right u-border-no-top u-input u-input-rectangle" size="3" multiple="multiple">
                             <option value="I am a Volunteer" data-calc="" selected="selected">I am a Volunteer</option>
                             <option value="I want to donate" data-calc="">I want to donate</option>
                             <option value="I am a sponsor" data-calc="">I am a sponsor</option>
@@ -251,9 +251,11 @@ borders: top right bottom left !important; border-color: #ff141e !important; bor
                           <svg class="u-caret u-caret-svg" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="16px" height="16px" viewBox="0 0 16 16" style="fill:currentColor;" xml:space="preserve"><polygon class="st0" points="8,12 2,4 14,4 "></polygon></svg>
                         </div>
                       </div>
+                      <input type="hidden" name="company" tabindex="-1" autocomplete="off" style="position: absolute; left: -9999px;">
                       <div class="u-align-left u-form-group u-form-submit u-label-none">
                         <a href="#" class="u-border-none u-btn u-btn-submit u-button-style u-palette-2-base u-btn-1">Submit</a>
                         <input type="submit" value="submit" class="u-form-control-hidden">
+                        <p class="form-status" aria-live="polite" style="margin-top: 10px; display: none;"></p>
                       </div>
                       <div class="u-form-send-message u-form-send-success">Thank you! Your message has been sent.</div>
                       <div class="u-form-send-error u-form-send-message">Unable to send your message. Please fix errors then try again.</div>
@@ -299,4 +301,5 @@ borders: top right bottom left !important; border-color: #ff141e !important; bor
   
 <script src="js/recaptcha-loader.js"></script>
 <script src="js/form-handler.js"></script>
+<script src="js/forms.js"></script>
 </body></html>
