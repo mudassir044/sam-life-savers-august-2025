@@ -41,6 +41,11 @@ The deployment should now work! The API endpoints are:
 - ⚠️ `/api/gallery/upload` - Returns instructions (needs Git commit)
 - ⚠️ `/api/gallery/delete` - Returns data (needs Git commit)
 
+## 📦 Dependency Installs
+
+- A project-level `.npmrc` pins the registry to `https://registry.npmjs.org/` so Vercel uses the public npm registry during builds.
+- If a local network/proxy returns `403 Forbidden` when fetching packages, run installs with `npm install --registry=https://registry.npmjs.org/` or configure the Vercel install command to include the registry flag.
+
 ## 📝 Next Steps
 
 1. **Deploy to Vercel** - Should work now

@@ -8,8 +8,6 @@
     <link rel="canonical" href="https://samlifesavers.org/Volunteer-Form.html">
     <link rel="stylesheet" href="nicepage.css" media="screen">
 <link rel="stylesheet" href="Volunteer-Form.css" media="screen">
-    <script class="u-script" type="text/javascript" src="jquery.js" defer=""></script>
-    <script class="u-script" type="text/javascript" src="nicepage.js" defer=""></script>
     <meta name="referrer" content="origin">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">
@@ -203,10 +201,10 @@ borders: top right bottom left !important; border-color: #ff141e !important; bor
               <div class="u-align-center u-container-align-center u-container-style u-layout-cell u-shape-rectangle u-size-34-lg u-size-34-xl u-size-60-md u-size-60-sm u-size-60-xs u-layout-cell-2" data-animation-name="customAnimationIn" data-animation-duration="1500" data-animation-delay="500">
                 <div class="u-container-layout u-valign-middle-xl u-valign-top-lg u-valign-top-md u-valign-top-sm u-container-layout-2">
                   <div class="custom-expanded u-form u-form-1">
-                    <form action="https://forms.nicepagesrv.com/v2/form/process" class="u-clearfix u-form-spacing-15 u-form-vertical u-inner-form" style="padding: 0;" source="email" name="form">
+                    <form action="/api/volunteer" method="post" class="u-clearfix u-form-spacing-15 u-form-vertical u-inner-form" style="padding: 0;" name="form" data-endpoint="/api/volunteer">
                       <div class="u-form-group u-form-name">
                         <label for="name-daf4" class="u-label">Name*</label>
-                        <input type="text" placeholder="Enter your Name" id="name-daf4" name="name" class="u-border-2 u-border-black u-border-no-left u-border-no-right u-border-no-top u-input u-input-rectangle" required="">
+                        <input type="text" placeholder="Enter your Name" id="name-daf4" name="fullName" class="u-border-2 u-border-black u-border-no-left u-border-no-right u-border-no-top u-input u-input-rectangle" required="">
                       </div>
                       <div class="u-form-email u-form-group u-form-group-2">
                         <label for="email-daf4" class="u-label">Email*</label>
@@ -219,7 +217,7 @@ borders: top right bottom left !important; border-color: #ff141e !important; bor
                       <div class="u-form-group u-form-select u-form-group-4">
                         <label for="select-6769" class="u-label">Gender*</label>
                         <div class="u-form-select-wrapper">
-                          <select id="select-6769" name="Gende*" class="u-border-2 u-border-black u-border-no-left u-border-no-right u-border-no-top u-input u-input-rectangle" required="required">
+                          <select id="select-6769" name="gender" class="u-border-2 u-border-black u-border-no-left u-border-no-right u-border-no-top u-input u-input-rectangle" required="required">
                             <option value="Male" data-calc="">Male</option>
                             <option value="Female" data-calc="">Female</option>
                             <option value="Other" data-calc="">Other</option>
@@ -231,47 +229,45 @@ borders: top right bottom left !important; border-color: #ff141e !important; bor
                       <div class="u-form-group u-form-number u-form-number-layout-range u-form-group-5">
                         <label for="range-d729" class="u-label">Age*</label>
                         <div class="u-input-row" data-value="0">
-                          <input value="0" min="0" max="50" step="1" type="range" placeholder="" id="range-d729" name="Age*" class="u-border-no-left u-border-no-right u-border-no-top u-input u-input-rectangle u-range u-text-black">
+                          <input value="0" min="0" max="50" step="1" type="range" placeholder="" id="range-d729" name="age" class="u-border-no-left u-border-no-right u-border-no-top u-input u-input-rectangle u-range u-text-black">
                         </div>
                       </div>
                       <div class="u-form-group u-form-group-6">
                         <label for="text-6340" class="u-label">Institute Name*</label>
-                        <input type="text" placeholder="Your answer" id="text-6340" name="Institute Name*" class="u-border-2 u-border-black u-border-no-left u-border-no-right u-border-no-top u-input u-input-rectangle" required="required" maxlength="100">
+                        <input type="text" placeholder="Your answer" id="text-6340" name="instituteName" class="u-border-2 u-border-black u-border-no-left u-border-no-right u-border-no-top u-input u-input-rectangle" required="required" maxlength="100">
                       </div>
                       <div class="u-form-group u-form-group-7">
                         <label for="text-e0ee" class="u-label">Department/Field*</label>
-                        <input type="text" placeholder="Your answer" id="text-e0ee" name="Institute Name*" class="u-border-2 u-border-black u-border-no-left u-border-no-right u-border-no-top u-input u-input-rectangle" required="required">
+                        <input type="text" placeholder="Your answer" id="text-e0ee" name="department" class="u-border-2 u-border-black u-border-no-left u-border-no-right u-border-no-top u-input u-input-rectangle" required="required">
                       </div>
                       <div class="u-form-group u-form-group-8">
                         <label for="text-1f29" class="u-label">Experience In Any Non-profit Organisation?*</label>
-                        <input type="text" placeholder="Your answer" id="text-1f29" name="Experience In Any Non-profit Organisation?*" class="u-border-2 u-border-black u-border-no-left u-border-no-right u-border-no-top u-input u-input-rectangle" required="required">
+                        <input type="text" placeholder="Your answer" id="text-1f29" name="nonprofitExperience" class="u-border-2 u-border-black u-border-no-left u-border-no-right u-border-no-top u-input u-input-rectangle" required="required">
                       </div>
                       <div class="u-form-group u-form-group-9">
                         <label for="text-c4f5" class="u-label">Current City*</label>
-                        <input type="text" placeholder="Your answer" id="text-c4f5" name="Current City*" class="u-border-2 u-border-black u-border-no-left u-border-no-right u-border-no-top u-input u-input-rectangle" required="required">
+                        <input type="text" placeholder="Your answer" id="text-c4f5" name="currentCity" class="u-border-2 u-border-black u-border-no-left u-border-no-right u-border-no-top u-input u-input-rectangle" required="required">
                       </div>
                       <div class="u-form-group u-form-group-10">
                         <label for="text-0f1e" class="u-label">CNIC</label>
-                        <input type="text" placeholder="Enter your CNIC number" id="text-0f1e" name="CNIC" class="u-border-2 u-border-black u-border-no-left u-border-no-right u-border-no-top u-input u-input-rectangle" required="required" maxlength="13">
+                        <input type="text" placeholder="Enter your CNIC number" id="text-0f1e" name="cnic" class="u-border-2 u-border-black u-border-no-left u-border-no-right u-border-no-top u-input u-input-rectangle" required="required" maxlength="13">
                       </div>
                       <div class="u-form-group u-form-message u-form-group-11">
                         <label for="message-daf4" class="u-label">Message (If Any)</label>
-                        <textarea rows="4" cols="50" id="message-daf4" name="Message (If Any)" class="u-border-2 u-border-black u-border-no-left u-border-no-right u-border-no-top u-input u-input-rectangle" required="required"></textarea>
+                        <textarea rows="4" cols="50" id="message-daf4" name="message" class="u-border-2 u-border-black u-border-no-left u-border-no-right u-border-no-top u-input u-input-rectangle" required="required"></textarea>
                       </div>
                       <div class="u-form-agree u-form-group u-form-group-12">
                         <label class="u-text-1 u-field-label" style=""></label>
-                        <input type="checkbox" id="agree-f183" name="Agree" class="u-agree-checkbox u-field-input" required="">
+                        <input type="checkbox" id="agree-f183" name="consent" class="u-agree-checkbox u-field-input" required="">
                         <label for="agree-f183" class="u-text-1 u-field-label" style="">I accept the <a href="#popup-041d" class="u-active-none u-border-none u-btn u-button-link u-button-style u-dialog-link u-hover-none u-none u-text-palette-1-base u-btn-2">Terms of Use</a>
                         </label>
                       </div>
+                      <input type="hidden" name="company" value="">
                       <div class="u-align-left u-form-group u-form-submit u-form-group-13">
                         <a href="#" class="u-active-palette-2-light-2 u-border-none u-btn u-btn-round u-btn-submit u-button-style u-hover-palette-2-light-1 u-palette-2-base u-radius-50 u-btn-3">Submit</a>
                         <input type="submit" value="submit" class="u-form-control-hidden">
+                        <p class="form-status" aria-live="polite"></p>
                       </div>
-                      <div class="u-form-send-message u-form-send-success">Thank you! Our team will be in contact with you shortly.</div>
-                      <div class="u-form-send-error u-form-send-message">Unable to send your message. Please fix errors then try again.</div>
-                      <input type="hidden" value="" name="recaptchaResponse">
-                      <input type="hidden" name="formServices" value="">
                     </form>
                   </div>
                 </div>
@@ -418,6 +414,5 @@ borders: top right bottom left !important; border-color: #ff141e !important; bor
     padding-right: 25px;
   }
 }</style>
-<script src="js/recaptcha-loader.js"></script>
-<script src="js/form-handler.js"></script>
+<script src="js/forms.js" defer></script>
 </body></html>
