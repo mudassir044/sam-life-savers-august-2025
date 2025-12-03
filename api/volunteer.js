@@ -105,11 +105,47 @@ async function sendAutoReply(to) {
     console.error('[AUTO-REPLY FAILED] TEMPLATE_VOLUNTEER environment variable is not set');
     throw new Error('TEMPLATE_VOLUNTEER environment variable is missing. Please set it in Vercel dashboard.');
   }
-  await resend.emails.send({
-    from: 'SAM Life Savers <hello@join.samlifesavers.org>',
-    to,
-    template_id: templateId,
-  });
+  try {
+    console.log('[AUTO-REPLY ATTEMPT] Sending volunteer auto-reply');
+    console.log(`[AUTO-REPLY ATTEMPT] Template ID: ${templateId}`);
+    console.log(`[AUTO-REPLY ATTEMPT] To: ${to}`);
+    
+    // Try template object format (Resend v3 format)
+    let result;
+    try {
+      result = await resend.emails.send({
+        from: 'SAM Life Savers <hello@join.samlifesavers.org>',
+        to,
+        template: {
+          id: templateId,
+          variables: {} // Empty object if template has no variables
+        }
+      });
+    } catch (templateObjError) {
+      // Fallback: try template_id format (older format)
+      console.log(`[AUTO-REPLY] Template object format failed, trying template_id format...`);
+      result = await resend.emails.send({
+        from: 'SAM Life Savers <hello@join.samlifesavers.org>',
+        to,
+        template_id: templateId,
+      });
+    }
+    console.log('[AUTO-REPLY SUCCESS] Volunteer auto-reply sent:', result);
+    return result;
+  } catch (error) {
+    console.error('[AUTO-REPLY FAILED] Resend API error for volunteer');
+    console.error(`[AUTO-REPLY FAILED] Template ID used: ${templateId}`);
+    console.error('[AUTO-REPLY FAILED] Error object:', error);
+    console.error('[AUTO-REPLY FAILED] Error details:', JSON.stringify(error, null, 2));
+    
+    // Check if it's a Resend API error with response details
+    if (error.response) {
+      console.error('[AUTO-REPLY FAILED] Resend API response:', JSON.stringify(error.response, null, 2));
+    }
+    
+    // Re-throw with more context
+    throw new Error(`Failed to send auto-reply email: ${error.message || 'Template may be empty or not published in Resend. Please check your Resend templates.'}`);
+  }
 }
 
 module.exports = async (req, res) => {
