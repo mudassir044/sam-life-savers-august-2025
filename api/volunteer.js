@@ -1,89 +1,144 @@
 const { Resend } = require('resend');
 
+const resend = new Resend(process.env.RESEND_API_KEY);
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || '')
+  .split(',')
+  .map((email) => email.trim())
+  .filter(Boolean);
+
+function parseBody(req) {
+  if (typeof req.body === 'string') {
+    try {
+      return JSON.parse(req.body);
+    } catch (error) {
+      return {};
+    }
+  }
+  return req.body || {};
+}
+
+function stringifyValue(value) {
+  if (value === null || value === undefined) return '';
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object') return JSON.stringify(value);
+  return String(value);
+}
+
+function normalizeFields(body) {
+  const normalized = {};
+  Object.entries(body || {}).forEach(([key, value]) => {
+    if (Array.isArray(value)) {
+      normalized[key] = value.map((v) => stringifyValue(v));
+    } else {
+      normalized[key] = stringifyValue(value);
+    }
+  });
+  return normalized;
+}
+
+function validateLengths(fields) {
+  let totalLength = 0;
+  for (const value of Object.values(fields)) {
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        if (item.length > 5000) {
+          return 'Each field must be at most 5000 characters.';
+        }
+        totalLength += item.length;
+      }
+    } else {
+      if (value.length > 5000) {
+        return 'Each field must be at most 5000 characters.';
+      }
+      totalLength += value.length;
+    }
+  }
+  if (totalLength > 20000) {
+    return 'Combined input is too long (max 20000 characters).';
+  }
+  return null;
+}
+
+function findEmail(fields) {
+  const emailRegex = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i;
+  for (const [key, value] of Object.entries(fields)) {
+    if (key.toLowerCase().includes('email')) {
+      if (Array.isArray(value)) {
+        const found = value.find((item) => emailRegex.test(item));
+        if (found) return found;
+      } else if (emailRegex.test(value)) {
+        return value;
+      }
+    }
+  }
+  for (const value of Object.values(fields)) {
+    if (Array.isArray(value)) {
+      const found = value.find((item) => emailRegex.test(item));
+      if (found) return found;
+    } else if (emailRegex.test(value)) {
+      return value;
+    }
+  }
+  return null;
+}
+
+function formatAdminBody(fields) {
+  return Object.entries(fields)
+    .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
+    .join('\n');
+}
+
+async function sendAdminEmail(subject, fields, replyTo) {
+  if (!ADMIN_EMAILS.length) return;
+  await resend.emails.send({
+    from: 'SAM Life Savers <hello@join.samlifesavers.org>',
+    to: ADMIN_EMAILS,
+    subject,
+    text: formatAdminBody(fields),
+    reply_to: replyTo || undefined,
+  });
+}
+
+async function sendAutoReply(to) {
+  const templateId = process.env.TEMPLATE_VOLUNTEER;
+  if (!templateId) return;
+  await resend.emails.send({
+    from: 'SAM Life Savers <hello@join.samlifesavers.org>',
+    to,
+    template_id: templateId,
+  });
+}
+
 module.exports = async (req, res) => {
-  // Only allow POST
+  res.setHeader('Content-Type', 'application/json');
   if (req.method !== 'POST') {
     return res.status(405).json({ ok: false, error: 'Method not allowed' });
   }
 
+  const body = parseBody(req);
+  if (body.company && String(body.company).trim() !== '') {
+    return res.status(200).json({ ok: true });
+  }
+
+  const fields = normalizeFields(body);
+  const validationError = validateLengths(fields);
+  if (validationError) {
+    return res.status(400).json({ ok: false, error: validationError });
+  }
+
+  const submitterEmail = findEmail(fields);
+  if (!submitterEmail) {
+    return res.status(400).json({ ok: false, error: 'A valid email is required.' });
+  }
+
+  const subject = `New Volunteer Application - ${submitterEmail}`;
+
   try {
-    // Parse JSON body
-    let body;
-    if (typeof req.body === 'string') {
-      body = JSON.parse(req.body);
-    } else {
-      body = req.body || {};
-    }
-
-    // Honeypot check
-    if (body.company && body.company.trim() !== '') {
-      return res.status(200).json({ ok: true });
-    }
-
-    // Find submitter email (case-insensitive check)
-    const emailKeys = ['email', 'Email', 'emailAddress', 'EmailAddress', 'e-mail', 'E-mail'];
-    let submitterEmail = null;
-    for (const key of emailKeys) {
-      if (body[key]) {
-        submitterEmail = body[key];
-        break;
-      }
-    }
-
-    if (!submitterEmail) {
-      return res.status(400).json({ ok: false, error: 'Email is required' });
-    }
-
-    // Validation: max 5000 chars per field, max 20000 total
-    let totalLength = 0;
-    for (const [key, value] of Object.entries(body)) {
-      if (key === 'company') continue; // Skip honeypot
-      const strValue = Array.isArray(value) ? value.join(', ') : String(value);
-      if (strValue.length > 5000) {
-        return res.status(400).json({ ok: false, error: `Field ${key} exceeds maximum length` });
-      }
-      totalLength += strValue.length;
-    }
-    if (totalLength > 20000) {
-      return res.status(400).json({ ok: false, error: 'Total data exceeds maximum length' });
-    }
-
-    const resend = new Resend(process.env.RESEND_API_KEY);
-    const adminEmails = (process.env.ADMIN_EMAILS || '').split(',').map(e => e.trim()).filter(e => e);
-
-    // Get best identifier for subject
-    const name = body['name'] || body['Name'] || submitterEmail;
-    const subject = `Volunteer Form Submission - ${name}`;
-
-    // Build admin email body
-    const adminBody = Object.entries(body)
-      .filter(([key]) => key !== 'company')
-      .map(([key, value]) => {
-        const displayValue = Array.isArray(value) ? value.join(', ') : String(value);
-        return `${key}: ${displayValue}`;
-      })
-      .join('\n');
-
-    // Send admin notification
-    await resend.emails.send({
-      from: 'SAM Life Savers <hello@join.samlifesavers.org>',
-      to: adminEmails,
-      replyTo: submitterEmail,
-      subject: subject,
-      text: adminBody,
-    });
-
-    // Send auto-reply
-    await resend.emails.send({
-      from: 'SAM Life Savers <hello@join.samlifesavers.org>',
-      to: submitterEmail,
-      templateId: process.env.TEMPLATE_VOLUNTEER,
-    });
-
+    await sendAdminEmail(subject, fields, submitterEmail);
+    await sendAutoReply(submitterEmail);
     return res.status(200).json({ ok: true });
   } catch (error) {
-    console.error('Volunteer API error:', error);
-    return res.status(500).json({ ok: false, error: error.message || 'Internal server error' });
+    console.error('Volunteer submission error:', error?.message || error);
+    return res.status(500).json({ ok: false, error: 'Failed to send emails.' });
   }
 };
-
