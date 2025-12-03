@@ -24,10 +24,18 @@
                 
                 const submitButton = form.querySelector('input[type="submit"], button[type="submit"], .u-btn-submit, a.u-btn-submit');
                 const originalText = submitButton ? (submitButton.textContent || submitButton.value || 'Submit') : 'Submit';
+                const isAnchor = submitButton && submitButton.tagName === 'A';
                 
-                // Disable submit button
+                // Disable submit button (handle anchor elements differently)
                 if (submitButton) {
-                    submitButton.disabled = true;
+                    if (isAnchor) {
+                        // For anchor elements, prevent clicks and add visual feedback
+                        submitButton.style.pointerEvents = 'none';
+                        submitButton.style.opacity = '0.6';
+                        submitButton.style.cursor = 'not-allowed';
+                    } else {
+                        submitButton.disabled = true;
+                    }
                     if (submitButton.textContent !== undefined) {
                         submitButton.textContent = 'Sending...';
                     } else if (submitButton.value !== undefined) {
@@ -63,8 +71,8 @@
                     const data = {};
                     
                     // Handle duplicate field names as arrays
+                    // Include honeypot field - API needs it for spam protection
                     for (const [key, value] of formData.entries()) {
-                        if (key === 'company') continue; // Skip honeypot in display
                         if (data[key]) {
                             if (Array.isArray(data[key])) {
                                 data[key].push(value);
@@ -112,9 +120,16 @@
                         errorMsg.style.display = 'block';
                     }
                 } finally {
-                    // Re-enable submit button
+                    // Re-enable submit button (handle anchor elements differently)
                     if (submitButton) {
-                        submitButton.disabled = false;
+                        if (isAnchor) {
+                            // Restore anchor element
+                            submitButton.style.pointerEvents = '';
+                            submitButton.style.opacity = '';
+                            submitButton.style.cursor = '';
+                        } else {
+                            submitButton.disabled = false;
+                        }
                         if (submitButton.textContent !== undefined) {
                             submitButton.textContent = originalText;
                         } else if (submitButton.value !== undefined) {
