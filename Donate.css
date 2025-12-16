@@ -1,0 +1,264 @@
+.donate-page {
+  padding: 2rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.donate-hero {
+  text-align: center;
+  padding: 3rem 1rem;
+  margin-bottom: 3rem;
+}
+
+.donate-hero__content h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #1a1a1a;
+}
+
+.donate-hero__content p {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: #666;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.donation-details {
+  margin-bottom: 3rem;
+}
+
+.section-heading {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.section-heading h2 {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #1a1a1a;
+}
+
+.section-heading p {
+  font-size: 1.1rem;
+  color: #666;
+}
+
+.donation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.donation-card {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.donation-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.donation-card h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #1a1a1a;
+  text-align: center;
+}
+
+.donation-info {
+  margin-bottom: 1.5rem;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-row .label {
+  font-size: 0.875rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+.value-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.info-row .value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  word-break: break-word;
+}
+
+/* Prevent account names from breaking */
+.info-row--name .value--name {
+  white-space: nowrap;
+  word-break: normal;
+}
+
+.copy-btn {
+  background: none;
+  border: none;
+  color: #ff141e;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: inline-flex;
+  align-items: center;
+  transition: opacity 0.2s;
+}
+
+.copy-btn:hover {
+  opacity: 0.7;
+}
+
+.copy-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.qr-wrap {
+  text-align: center;
+  padding-top: 1rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+.qr-wrap img {
+  max-width: 200px;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  background: #fff;
+  padding: 0.5rem;
+  border: 1px solid #e0e0e0;
+}
+
+.donation-followup {
+  text-align: center;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+  margin-top: 2rem;
+}
+
+.donation-followup p {
+  margin: 0;
+  font-size: 1rem;
+  color: #333;
+  line-height: 1.6;
+}
+
+.donation-followup a {
+  color: #ff141e;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.donation-followup a:hover {
+  text-decoration: underline;
+}
+
+.copy-toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(100%);
+  background: #1a1a1a;
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 10000;
+  font-size: 0.875rem;
+}
+
+.copy-toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .donate-page {
+    padding: 1rem 0.5rem;
+  }
+
+  .donate-hero {
+    padding: 2rem 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .donation-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .donation-card {
+    padding: 1.25rem;
+  }
+
+  .info-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .value-row {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .info-row .value {
+    font-size: 0.9rem;
+  }
+
+  /* Allow account names to wrap on very small screens, but only at word boundaries */
+  .info-row--name .value--name {
+    white-space: normal;
+    word-break: normal;
+    overflow-wrap: break-word;
+  }
+
+  .qr-wrap img {
+    max-width: 180px;
+  }
+
+  .donation-followup {
+    padding: 1.25rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .donate-hero__content h1 {
+    font-size: 1.75rem;
+  }
+
+  .section-heading h2 {
+    font-size: 1.5rem;
+  }
+
+  .donation-card h3 {
+    font-size: 1.25rem;
+  }
+}
