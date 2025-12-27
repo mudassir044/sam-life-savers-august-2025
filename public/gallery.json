@@ -302,5 +302,141 @@
     "description": "Our mission continues",
     "width": 1920,
     "height": 1282
+  },
+  {
+    "id": 39,
+    "image": "images/team-picture-sam-life-savers-acp-project-team.jpeg",
+    "title": "ACP Project Team",
+    "description": "Team photo from the SAM Life Savers ACP project",
+    "width": 1920,
+    "height": 1280
+  },
+  {
+    "id": 40,
+    "image": "images/muniba-sam-life-savers-picture-acp-project.jpeg",
+    "title": "Muniba at ACP Project",
+    "description": "Muniba supporting the ACP project",
+    "width": 1920,
+    "height": 1280
+  },
+  {
+    "id": 41,
+    "image": "images/sam-life-savers-acp-project-with-orphan-kids.jpeg",
+    "title": "ACP Project with Orphan Kids",
+    "description": "Spending time with children during the ACP project",
+    "width": 1920,
+    "height": 1280
+  },
+  {
+    "id": 42,
+    "image": "images/mudassir-sam-life-savers-acp-event.jpeg",
+    "title": "Mudassir at ACP Event",
+    "description": "Leadership on site at the ACP event",
+    "width": 1920,
+    "height": 1280
+  },
+  {
+    "id": 43,
+    "image": "images/fatima-birthday-orphan-project-celebrations-samlifesavers.jpeg",
+    "title": "Fatima Birthday Celebration",
+    "description": "Celebrating birthdays with the orphanage project",
+    "width": 1920,
+    "height": 1280
+  },
+  {
+    "id": 44,
+    "image": "images/welcome-of-kids-acp-event.jpeg",
+    "title": "Welcome of Kids at ACP Event",
+    "description": "A warm welcome for kids during the ACP event",
+    "width": 1920,
+    "height": 1280
+  },
+  {
+    "id": 45,
+    "image": "images/shavez-welcome-kid-acp-event.jpeg",
+    "title": "Shavez Welcoming Kids",
+    "description": "Shavez greeting participants at the ACP event",
+    "width": 1920,
+    "height": 1280
+  },
+  {
+    "id": 46,
+    "image": "images/samlifesavers-dast-e-khidmat-event-awards.jpeg",
+    "title": "Dast-e-Khidmat Awards",
+    "description": "Recognizing volunteers at the Dast-e-Khidmat event",
+    "width": 1920,
+    "height": 1280
+  },
+  {
+    "id": 47,
+    "image": "images/samlifesavers-team-photo-with-kids-dast-e-shafqat.jpeg",
+    "title": "Team with Kids - Dast-e-Shafqat",
+    "description": "Team photo with children at Dast-e-Shafqat",
+    "width": 1920,
+    "height": 1280
+  },
+  {
+    "id": 48,
+    "image": "images/shavez-photo-dast-e-shafqat-event.jpeg",
+    "title": "Shavez at Dast-e-Shafqat",
+    "description": "Leading activities at the Dast-e-Shafqat event",
+    "width": 1920,
+    "height": 1280
+  },
+  {
+    "id": 49,
+    "image": "images/mudassir-giving-kid-gift-dast-e-shafqat-event.jpeg",
+    "title": "Mudassir Giving Gifts",
+    "description": "Sharing gifts with kids at Dast-e-Shafqat",
+    "width": 1920,
+    "height": 1280
+  },
+  {
+    "id": 50,
+    "image": "images/ability-fiesta-banner-photo.jpeg",
+    "title": "Ability Fiesta Banner",
+    "description": "Event banner for the Ability Fiesta",
+    "width": 1920,
+    "height": 1280
+  },
+  {
+    "id": 51,
+    "image": "images/ability-fiesta-kids-fun-photo.jpeg",
+    "title": "Ability Fiesta Fun",
+    "description": "Kids enjoying activities at the Ability Fiesta",
+    "width": 1920,
+    "height": 1280
+  },
+  {
+    "id": 52,
+    "image": "images/ability-fiesta-special-kids-playing-photo-.jpeg",
+    "title": "Ability Fiesta Playtime",
+    "description": "Special kids playing during the Ability Fiesta",
+    "width": 1920,
+    "height": 1280
+  },
+  {
+    "id": 53,
+    "image": "images/fatima-birthday-event-heatbox-samlifesavers-2025-acp-project.jpeg",
+    "title": "Fatima Birthday Event (Heatbox)",
+    "description": "Celebration during the 2025 ACP project",
+    "width": 1920,
+    "height": 1280
+  },
+  {
+    "id": 54,
+    "image": "images/dast-e-khidmat-samlifesavers-team-pic.jpeg",
+    "title": "Dast-e-Khidmat Team",
+    "description": "SAM Life Savers team at the Dast-e-Khidmat event",
+    "width": 1920,
+    "height": 1280
+  },
+  {
+    "id": 55,
+    "image": "images/dast-e-khidmat-samlifesavers-old-age.jpeg",
+    "title": "Dast-e-Khidmat Old Age Visit",
+    "description": "Supporting elders during Dast-e-Khidmat",
+    "width": 1920,
+    "height": 1280
   }
 ]
