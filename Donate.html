@@ -143,6 +143,91 @@
     <meta name="twitter:image:alt" content="SAM Life Savers Logo">
   <meta data-intl-tel-input-cdn-path="intlTelInput/">
   <script defer src="/_vercel/insights/script.js"></script>
+
+  <!-- Analytics Tracking Code -->
+<script>
+  (function() {
+    var TRACKING_ID = "trk_4662967e3304";
+    var API_URL = "https://ujuevowwhulbyyugtefg.supabase.co/functions/v1/track";
+    
+    // Generate visitor ID
+    var visitorId = localStorage.getItem('_analytics_vid');
+    if (!visitorId) {
+      visitorId = 'v_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+      localStorage.setItem('_analytics_vid', visitorId);
+    }
+    
+    // Generate session ID
+    var sessionId = sessionStorage.getItem('_analytics_sid');
+    if (!sessionId) {
+      sessionId = 's_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+      sessionStorage.setItem('_analytics_sid', sessionId);
+    }
+    
+    // Get device info
+    var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    var isTablet = /iPad|Android/i.test(navigator.userAgent) && !isMobile;
+    var deviceType = isMobile ? 'Mobile' : isTablet ? 'Tablet' : 'Desktop';
+    
+    // Get browser info
+    var ua = navigator.userAgent;
+    var browser = 'Unknown';
+    if (ua.includes('Firefox')) browser = 'Firefox';
+    else if (ua.includes('SamsungBrowser')) browser = 'Samsung Browser';
+    else if (ua.includes('Opera') || ua.includes('OPR')) browser = 'Opera';
+    else if (ua.includes('Edge')) browser = 'Edge';
+    else if (ua.includes('Chrome')) browser = 'Chrome';
+    else if (ua.includes('Safari')) browser = 'Safari';
+    
+    // Get OS
+    var os = 'Unknown';
+    if (ua.includes('Windows')) os = 'Windows';
+    else if (ua.includes('Mac')) os = 'macOS';
+    else if (ua.includes('Linux')) os = 'Linux';
+    else if (ua.includes('Android')) os = 'Android';
+    else if (ua.includes('iOS') || ua.includes('iPhone')) os = 'iOS';
+    
+    // Track page view
+    function trackPageView() {
+      var data = {
+        tracking_id: TRACKING_ID,
+        visitor_id: visitorId,
+        session_id: sessionId,
+        page_url: window.location.href,
+        page_title: document.title,
+        referrer: document.referrer,
+        device_type: deviceType,
+        browser: browser,
+        os: os,
+        screen_width: screen.width,
+        screen_height: screen.height
+      };
+      
+      fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+        keepalive: true
+      }).catch(function() {});
+    }
+    
+    // Track on page load
+    if (document.readyState === 'complete') {
+      trackPageView();
+    } else {
+      window.addEventListener('load', trackPageView);
+    }
+    
+    // Track on navigation (for SPAs)
+    var pushState = history.pushState;
+    history.pushState = function() {
+      pushState.apply(history, arguments);
+      trackPageView();
+    };
+    
+    window.addEventListener('popstate', trackPageView);
+  })();
+  </script>
 </head>
   <body data-path-to-root="./" data-include-products="false" class="u-body u-xl-mode" data-lang="en"><header class="u-box-shadow u-clearfix u-gradient u-header u-sticky u-header" id="header"><div class="u-clearfix u-sheet u-valign-middle-lg u-valign-top-sm u-sheet-1">
         <a href="./" data-page-id="765531018" class="u-enable-responsive u-image u-logo u-image-1" data-image-width="500" data-image-height="500" title="Home">
